@@ -37,12 +37,8 @@ function compose_email() {
     .then(result => {
         // Print result
         console.log(result);
+        load_mailbox('sent');
     });
-
-    // Show sent view and hide other views
-    document.querySelector('#emails-view').style.display = 'block';
-    document.querySelector('#compose-view').style.display = 'none';
-    load_mailbox('sent');
     
     return false;
   }
@@ -70,6 +66,14 @@ function load_mailbox(mailbox) {
       // Print emails
       console.log(emails);
 
-      // ... do something else with emails ...
+      emails.forEach(function(email) {
+        const element = document.createElement('div');
+        element.innerHTML = email.sender;
+        element.addEventListener('click', function() {
+          console.log(email.id)
+        });
+        document.querySelector('#emails-view').append(element);
+      })
+      
   });
 }
