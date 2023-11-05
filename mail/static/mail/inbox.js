@@ -68,9 +68,40 @@ function load_mailbox(mailbox) {
 
       emails.forEach(function(email) {
         const element = document.createElement('div');
-        element.innerHTML = email.sender;
+        element.style.border = '1px solid black';
+        element.style.padding = '10px 10px 0px 10px';
+        
+        if(!email.read === false) {
+          element.style.backgroundColor = 'grey';
+        }if(mailbox === 'sent') {
+          element.style.backgroundColor = 'white';
+        }
+
+        const element_p = document.createElement('p');
+        
+        const element_email = document.createElement('span');
+        element_email.style.fontWeight = 'bold';
+        element_email.style.fontSize = '16px';
+        element_email.style.marginRight = '10px';
+        
+        if(mailbox === 'sent') {
+          element_email.innerHTML = email.recipients;
+        } if(mailbox === 'inbox') {
+          element_email.innerHTML = email.sender;
+        } 
+
+        const element_subject = document.createElement('span');
+        element_subject.innerHTML = email.subject;
+
+        const element_timestamp = document.createElement('span');
+        element_timestamp.style.float = 'right';
+        element_timestamp.innerHTML = email.timestamp;
+
+        element_p.append(element_email, element_subject, element_timestamp)
+        element.append(element_p)
+
         element.addEventListener('click', function() {
-          console.log(email.id)
+          console.log(email)
         });
         document.querySelector('#emails-view').append(element);
       })
