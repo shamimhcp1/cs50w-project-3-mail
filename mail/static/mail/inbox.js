@@ -56,6 +56,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#content-view').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -71,6 +72,7 @@ function load_mailbox(mailbox) {
         element.style.border = '1px solid black';
         element.style.padding = '10px 10px 0px 10px';
         
+        // If the email is unread or read
         if(!email.read === false) {
           element.style.backgroundColor = 'grey';
         }if(mailbox === 'sent') {
@@ -90,20 +92,70 @@ function load_mailbox(mailbox) {
           element_email.innerHTML = email.sender;
         } 
 
+        // subject retrive
         const element_subject = document.createElement('span');
         element_subject.innerHTML = email.subject;
 
+        // timestamp retrive
         const element_timestamp = document.createElement('span');
         element_timestamp.style.float = 'right';
         element_timestamp.innerHTML = email.timestamp;
 
         element_p.append(element_email, element_subject, element_timestamp)
         element.append(element_p)
-
-        element.addEventListener('click', function() {
-          console.log(email)
-        });
         document.querySelector('#emails-view').append(element);
+
+        // When a user clicks on an email
+        element.addEventListener('click', function() {
+  
+          // Show the mailbox and hide other views
+          document.querySelector('#emails-view').style.display = 'none';
+          document.querySelector('#compose-view').style.display = 'none';
+          document.querySelector('#content-view').style.display = 'block';
+
+          fetch('/emails/'+email.id)
+          .then(response => response.json())
+          .then(content => {
+            
+            console.log(content);
+
+            const content_p_from = document.createElement('p');
+            const content_p_to = document.createElement('p');
+            
+            const content_p_subject = document.createElement('p');
+            const content_p_subject_label = document.createElement('span');
+            content_p_subject_label.style.fontWeight = 'bold';
+            content_p_subject_label.style.marginRight = '10px';
+            content_p_subject_label.innerHTML = 'Subject:'
+            const content_p_subject_data = document.createElement('span');
+            content_p_subject_data.innerHTML = content.subject;
+            content_p_subject.append(content_p_subject_label, content_p_subject_data)
+
+            const content_p_timestamp = document.createElement('p');
+            const content_p_timestamp_label = document.createElement('span');
+            content_p_timestamp_label.style.fontWeight = 'bold';
+            content_p_timestamp_label.style.marginRight = '10px';
+            content_p_timestamp_label.innerHTML = 'Timestamp:'
+            const content_p_timestamp_data = document.createElement('span');
+            content_p_timestamp_data.innerHTML = content.timestamp;
+            content_p_timestamp.append(content_p_timestamp_label, content_p_timestamp_data)
+
+            const content_button_reply = document.createElement('button');
+            content_button_reply.className = 'btn btn-sm btn-outline-primary'
+            content_button_reply.innerHTML = 'Reply';
+            content_button_reply.addEventListener('click', function() {
+              console.log(content.id)
+            })
+            
+            const content_hr = document.createElement('hr');
+            const content_p_body = document.createElement('p');
+            content_p_body.innerHTML = content.body;
+
+            document.querySelector('#content-view').append(content_p_from, content_p_to, content_p_subject, content_p_timestamp, content_button_reply, content_hr, content_p_body)
+          })
+
+        });
+        
       })
       
   });
