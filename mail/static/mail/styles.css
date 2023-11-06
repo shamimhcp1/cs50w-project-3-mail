@@ -1,3 +1,16 @@
 textarea {
     min-height: 400px;
 }
+
+#content-view p {
+    margin: 0;
+}
+
+#emails-view div {
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+}
+#emails-view p {
+    margin: 0;
+}

@@ -6,8 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
 
+  // Clear the previous content in #content-view before adding new content
+  document.querySelector('#content-view').innerHTML = '';
+
   // By default, load the inbox
   load_mailbox('inbox');
+  // Store mailbox in local storage
+  localStorage.setItem('mailbox', 'inbox');
 });
 
 function compose_email() {
@@ -15,6 +20,9 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+
+  // Clear the previous content in #content-view before adding new content
+  document.querySelector('#content-view').innerHTML = '';
   
   // Clear out composition fields
   clearCompose();
@@ -52,11 +60,17 @@ function clearCompose() {
 }
 
 function load_mailbox(mailbox) {
+
+  // Store mailbox in local storage
+  localStorage.setItem('mailbox', mailbox);
   
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#content-view').style.display = 'none';
+
+  // Clear the previous content in #content-view before adding new content
+  document.querySelector('#content-view').innerHTML = '';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -69,8 +83,6 @@ function load_mailbox(mailbox) {
 
       emails.forEach(function(email) {
         const element = document.createElement('div');
-        element.style.border = '1px solid black';
-        element.style.padding = '10px 10px 0px 10px';
         
         // If the email is unread or read
         if(!email.read === false) {
@@ -83,7 +95,6 @@ function load_mailbox(mailbox) {
         
         const element_email = document.createElement('span');
         element_email.style.fontWeight = 'bold';
-        element_email.style.fontSize = '16px';
         element_email.style.marginRight = '10px';
         
         if(mailbox === 'sent') {
@@ -118,10 +129,34 @@ function load_mailbox(mailbox) {
           .then(content => {
             
             console.log(content);
-
-            const content_p_from = document.createElement('p');
-            const content_p_to = document.createElement('p');
             
+            // mark the email as read
+            fetch('/emails/'+email.id, {
+              method: 'PUT',
+              body: JSON.stringify({
+                  read: true
+              })
+            })
+
+            // from
+            const content_p_from = document.createElement('p');
+            const content_p_from_label = document.createElement('span');
+            content_p_from_label.style.fontWeight = 'bold';
+            content_p_from_label.style.marginRight = '10px';
+            content_p_from_label.innerHTML = 'From:'
+            const content_p_from_data = document.createElement('span');
+            content_p_from_data.innerHTML = content.sender;
+            content_p_from.append(content_p_from_label, content_p_from_data)
+            // To
+            const content_p_to = document.createElement('p');
+            const content_p_to_label = document.createElement('span');
+            content_p_to_label.style.fontWeight = 'bold';
+            content_p_to_label.style.marginRight = '10px';
+            content_p_to_label.innerHTML = 'To:'
+            const content_p_to_data = document.createElement('span');
+            content_p_to_data.innerHTML = content.recipients;
+            content_p_to.append(content_p_to_label, content_p_to_data)
+            // Subject
             const content_p_subject = document.createElement('p');
             const content_p_subject_label = document.createElement('span');
             content_p_subject_label.style.fontWeight = 'bold';
@@ -130,7 +165,7 @@ function load_mailbox(mailbox) {
             const content_p_subject_data = document.createElement('span');
             content_p_subject_data.innerHTML = content.subject;
             content_p_subject.append(content_p_subject_label, content_p_subject_data)
-
+            // timestamp
             const content_p_timestamp = document.createElement('p');
             const content_p_timestamp_label = document.createElement('span');
             content_p_timestamp_label.style.fontWeight = 'bold';
@@ -139,19 +174,33 @@ function load_mailbox(mailbox) {
             const content_p_timestamp_data = document.createElement('span');
             content_p_timestamp_data.innerHTML = content.timestamp;
             content_p_timestamp.append(content_p_timestamp_label, content_p_timestamp_data)
-
+            // reply or archived button
             const content_button_reply = document.createElement('button');
-            content_button_reply.className = 'btn btn-sm btn-outline-primary'
+            content_button_reply.className = 'btn btn-sm btn-outline-primary mr-2'
             content_button_reply.innerHTML = 'Reply';
             content_button_reply.addEventListener('click', function() {
-              console.log(content.id)
+              console.log('reply')
             })
-            
+            // reply or Archive button
+            const content_button_archived = document.createElement('button');
+            content_button_archived.className = 'btn btn-sm btn-outline-primary'
+            content_button_archived.innerHTML = 'Archive / Unarchive';
+            content_button_archived.addEventListener('click', function() {
+              console.log('archive')
+            })
+            // hr
             const content_hr = document.createElement('hr');
+            // body
             const content_p_body = document.createElement('p');
             content_p_body.innerHTML = content.body;
-
-            document.querySelector('#content-view').append(content_p_from, content_p_to, content_p_subject, content_p_timestamp, content_button_reply, content_hr, content_p_body)
+            // append all element
+            
+            if(localStorage.getItem('mailbox') === 'inbox') {
+              document.querySelector('#content-view').append(content_p_from, content_p_to, content_p_subject, content_p_timestamp, content_button_reply, content_button_archived, content_hr, content_p_body)
+            } else {
+              document.querySelector('#content-view').append(content_p_from, content_p_to, content_p_subject, content_p_timestamp, content_hr, content_p_body)
+            }
+            
           })
 
         });
