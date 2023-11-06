@@ -14,3 +14,9 @@ textarea {
 #emails-view p {
     margin: 0;
 }
+#messageDisplay p{
+    text-align: center;
+    padding: 10px;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
