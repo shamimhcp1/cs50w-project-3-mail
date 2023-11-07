@@ -52,7 +52,9 @@ function compose_email() {
       .then(result => {
         // Print result
         console.log(result);
-        load_mailbox('sent');
+        if (result.status !== 400){
+          load_mailbox('sent');
+        }
         message_display(result);
       });
 
