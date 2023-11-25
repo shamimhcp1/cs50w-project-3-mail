@@ -1,6 +1,10 @@
 # cs50w-project-3-mail
 Design a front-end for an email client that makes API calls to send and receive emails.
 
+![Screenshot 1](https://cs50.harvard.edu/web/2020/projects/3/images/inbox.png)
+
+![Screenshot 2](https://cs50.harvard.edu/web/2020/projects/3/images/email.png)
+
 # Getting Started
 1. Download the distribution code from https://cdn.cs50.net/web/2020/spring/projects/3/mail.zip and unzip it.
 2. In your terminal, `cd` into the `mail` directory.
