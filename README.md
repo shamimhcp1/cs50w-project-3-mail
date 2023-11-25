@@ -2,24 +2,35 @@
 Design a front-end for an email client that makes API calls to send and receive emails.
 
 # Getting Started
-- Download the distribution code from https://cdn.cs50.net/web/2020/spring/projects/0/search.zip and unzip it. 
+1. Download the distribution code from https://cdn.cs50.net/web/2020/spring/projects/3/mail.zip and unzip it.
+2. In your terminal, `cd` into the `mail` directory.
+3. Run `python manage.py makemigrations mail` to make migrations for the `mail` app.
+4. Run `python manage.py migrate` to apply migrations to your database.
 
 # Specification
-Your website must meet the following requirements:
+Using JavaScript, HTML, and CSS, complete the implementation of your single-page-app email client inside of `inbox.js` (and not additional or other files; for grading purposes, we’re only going to be considering `inbox.js`!). You must fulfill the following requirements:
 
-- Your website should have at least three pages: one for regular Google Search (which must be called `index.html`), one for Google Image Search, and one for Google Advanced Search.
-    - On the Google Search page, there should be links in the upper-right of the page to go to Image Search or Advanced Search. On each of the other two pages, there should be a link in the upper-right to go back to Google Search.
-- On the Google Search page, the user should be able to type in a query, click “Google Search”, and be taken to the Google search results for that page.
-    - Like Google’s own, your search bar should be centered with rounded corners. The search button should also be centered, and should be beneath the search bar.
-- On the Google Image Search page, the user should be able to type in a query, click a search button, and be taken to the Google Image search results for that page.
-- On the Google Advanced Search page, the user should be able to provide input for the following four fields (taken from Google’s own advanced search options)
-    - Find pages with… “all these words:”
-    - Find pages with… “this exact word or phrase:”
-    - Find pages with… “any of these words:”
-    - Find pages with… “none of these words:”
-- Like Google’s own Advanced Search page, the four options should be stacked vertically, and all of the text fields should be left aligned.
-    - Consistent with Google’s own CSS, the “Advanced Search” button should be blue with white text.
-    - When the “Advanced Search” button is clicked, the user should be taken to the search results page for their given query.
-- Add an “I’m Feeling Lucky” button to the main Google Search page. Consistent with Google’s own behavior, clicking this link should take users directly to the first Google search result for the query, bypassing the normal results page.
-    - You may encounter a redirect notice when using the “I’m Feeling Lucky” button. Not to worry! This is an expected consequence of a security feature implemented by Google.
-- The CSS you write should resemble Google’s own aesthetics.
+- **Send Mail:** When a user submits the email composition form, add JavaScript code to actually send the email.
+    - You’ll likely want to make a `POST` request to `/emails`, passing in values for `recipients`, `subject`, and `body`.
+    - Once the email has been sent, load the user’s sent mailbox.
+- **Mailbox:** When a user visits their Inbox, Sent mailbox, or Archive, load the appropriate mailbox.
+    - You’ll likely want to make a `GET` request to `/emails/<mailbox>` to request the emails for a particular mailbox.
+    - When a mailbox is visited, the application should first query the API for the latest emails in that mailbox.
+    - When a mailbox is visited, the name of the mailbox should appear at the top of the page (this part is done for you).
+    - Each email should then be rendered in its own box (e.g. as a `<div>` with a border) that displays who the email is from, what the subject line is, and the timestamp of the email.
+    - If the email is unread, it should appear with a white background. If the email has been read, it should appear with a gray background.
+- **View Email:** When a user clicks on an email, the user should be taken to a view where they see the content of that email.
+    - You’ll likely want to make a `GET` request to `/emails/<email_id>` to request the email.
+    - Your application should show the email’s sender, recipients, subject, timestamp, and body.
+    - You’ll likely want to add an additional `div` to `inbox.html` (in addition to `emails-view` and `compose-view`) for displaying the email. Be sure to update your code to hide and show the right views when navigation options are clicked.
+    - Once the email has been clicked on, you should mark the email as read. Recall that you can send a `PUT` request to `/emails/<email_id>` to update whether an email is read or not.
+- **Archive and Unarchive:** Allow users to archive and unarchive emails that they have received.
+    - When viewing an Inbox email, the user should be presented with a button that lets them archive the email. When viewing an Archive email, the user should be presented with a button that lets them unarchive the email. This requirement does not apply to emails in the Sent mailbox.
+    - Recall that you can send a `PUT` request to `/emails/<email_id>` to mark an email as archived or unarchived.
+    - Once an email has been archived or unarchived, load the user’s inbox.
+- **Reply:** Allow users to reply to an email.
+    - When viewing an email, the user should be presented with a “Reply” button that lets them reply to the email.
+    - When the user clicks the “Reply” button, they should be taken to the email composition form.
+    - Pre-fill the composition form with the `recipient` field set to whoever sent the original email.
+    - Pre-fill the `subject` line. If the original email had a subject line of `foo`, the new subject line should be `Re: foo`. (If the subject line already begins with `Re: `, no need to add it again.)
+    - Pre-fill the `body` of the email with a line like `"On Jan 1 2020, 12:00 AM foo@example.com wrote:"` followed by the original text of the email.
